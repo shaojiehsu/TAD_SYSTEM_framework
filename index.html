@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>觀光署共構系統架構圖</title>
+<title>觀光署共構系統整體架構圖</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
 
@@ -175,7 +175,7 @@ h1{text-align:center;font-size:1.1rem;font-weight:700;letter-spacing:.06em;margi
 <div class="legend">
   <div class="leg"><div class="dot" style="background:var(--nb)"></div>開放資料與多媒體</div>
   <div class="leg"><div class="dot" style="background:var(--ma)"></div>AI 應用與 MCP</div>
-  <div class="leg"><div class="dot" style="background:var(--ec)"></div>網站建置維護</div>
+  <div class="leg"><div class="dot" style="background:var(--ec)"></div>共構網站系統</div>
   <div class="leg">
     <svg width="22" height="10"><line x1="0" y1="5" x2="16" y2="5" stroke="#aaa" stroke-width="1.5"/>
       <polygon points="16,2 22,5 16,8" fill="#aaa"/></svg>資料流
@@ -194,7 +194,7 @@ h1{text-align:center;font-size:1.1rem;font-weight:700;letter-spacing:.06em;margi
     <div class="box sh"><div class="box-title">觀光署既有資料</div>
       <ul class="box-list"><li>旅宿網、臺灣騎跡</li><li>83 項開放資料集</li><li>13 管理處上傳資料</li></ul></div>
     <div class="box sh"><div class="box-title">多媒體素材</div>
-      <ul class="box-list"><li>照片（自行 / 委外拍攝）</li><li>影音素材 / 文宣品</li><li>語料/語音檔</li></ul></div>
+      <ul class="box-list"><li>照片（自行 / 委外拍攝）</li><li>影音素材 / 文宣品</li><li>導覽用語料</li></ul></div>
   </div>
 
   <!-- arrow -->
@@ -307,7 +307,7 @@ h1{text-align:center;font-size:1.1rem;font-weight:700;letter-spacing:.06em;margi
               <li>觀光署 + 13 管理處統一編輯</li>
               <li>多語系（中/英/日/韓/泰/越）</li>
               <li>AI 翻譯 / 標籤輔助</li>
-              <li>駐點維運服務</li>
+              
             </ul>
           </div>
           <div>
@@ -380,10 +380,8 @@ h1{text-align:center;font-size:1.1rem;font-weight:700;letter-spacing:.06em;margi
         <div class="box-title" style="color:var(--ec);">出口一｜旅客即時獲取</div>
         <ul class="box-list">
           <li>觀光署全球資訊網 / 管理處資訊網 / 主題網</li>
-          <li>喔熊小幫手（AI 對話旅遊諮詢）</li>
-          <li>AI 行程規劃推薦</li>
-          <li>多語系旅遊資訊服務</li>
-          <li>PWA 行動版</li>
+          <li>喔熊小幫手（AI對話旅遊諮詢、行程規劃推薦）</li>
+          <li>PWA全台行動旅服（多語導覽）</li>
         </ul>
       </div>
     </div>
@@ -396,7 +394,7 @@ h1{text-align:center;font-size:1.1rem;font-weight:700;letter-spacing:.06em;margi
           <div class="box-title" style="color:var(--nb);">出口二｜民間服務整合</div>
           <ul class="box-list">
             <li>OAS API 第三方介接</li>
-            <li>Navitime、民間開發者</li>
+            <li>民間開發者</li>
             <li>官方資料擴大應用</li>
           </ul>
         </div>
@@ -404,7 +402,7 @@ h1{text-align:center;font-size:1.1rem;font-weight:700;letter-spacing:.06em;margi
           <div class="box-title" style="color:var(--sh);">出口三｜國際語料主權</div>
           <ul class="box-list">
             <li>Schema.org 結構化標記（資料層規範 → 網站層實作）</li>
-            <li>Google / Perplexity 索引，優先引用官方資料</li>
+            <li>Google/其他AI平台 索引，優先引用官方資料</li>
           </ul>
         </div>
       </div>
