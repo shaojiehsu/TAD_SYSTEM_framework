@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>觀光資訊網共構案 — 資料處理流程圖（OD Platform 控制中心版）</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Microsoft JhengHei", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    margin: 0;
+    padding: 24px;
+    background: #F8FAFC;
+    color: #1F2937;
+    line-height: 1.5;
+  }
+  .container { max-width: 1600px; margin: 0 auto; }
+  header {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #E5E7EB;
+  }
+  h1 {
+    margin: 0 0 6px 0;
+    font-size: 22px;
+    color: #1E2D4C;
+    letter-spacing: 0.5px;
+  }
+  .subtitle { color: #6B7280; font-size: 13px; }
+  .meta { margin-top: 6px; font-size: 11px; color: #9CA3AF; }
+  .legend {
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 12px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    font-size: 12px;
+    color: #374151;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-swatch {
+    width: 22px;
+    height: 14px;
+    border-radius: 3px;
+    display: inline-block;
+  }
+  .legend-line { display: inline-block; width: 26px; height: 0; }
+  svg {
+    width: 100%;
+    height: auto;
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    display: block;
+  }
+  .notes {
+    margin-top: 20px;
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 20px 24px;
+  }
+  .notes h3 {
+    font-size: 14px;
+    color: #1E2D4C;
+    margin: 0 0 12px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #E55B30;
+    display: inline-block;
+  }
+  .notes-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px 24px;
+  }
+  .note-item {
+    font-size: 12px;
+    color: #374151;
+    padding: 10px 14px;
+    background: #F9FAFB;
+    border-left: 3px solid #E55B30;
+    border-radius: 4px;
+  }
+  .note-item.cyan { border-left-color: #0891B2; }
+  .note-item.purple { border-left-color: #7C3AED; }
+  .note-item.green { border-left-color: #059669; }
+  .note-item.amber { border-left-color: #F59E0B; }
+  .note-item strong { color: #1E2D4C; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>觀光資訊網共構案 — 資料處理流程圖</h1>
+    <div class="subtitle">主軸：Raw Database → ETL → Data Mart → OD Database ｜ 控制中心：OD Platform（後台）｜ 對外前台：多媒體開放資料網 ｜ 鈕思介接：API（基於 reqUuid 機制）</div>
+    <div class="meta">編製：鈕酷樂專案管理 ｜ 用途：跨公司分工釐清 ｜ 已對齊《鈕酷樂×思邁介接文件》</div>
+  </header>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-swatch" style="background:#E55B30"></span><span>鈕酷樂</span></div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#0891B2"></span><span>思邁</span></div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#7C3AED"></span><span>OD Platform 後台（駐點操作）</span></div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#059669"></span><span>對外前台（多媒體開放資料網）</span></div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#64748B"></span><span>來源單位／其他端點</span></div>
+    <div class="legend-item"><span class="legend-line" style="border-top:2.5px solid #1E2D4C"></span><span>資料流</span></div>
+    <div class="legend-item"><span class="legend-line" style="border-top:2.5px dashed #7C3AED"></span><span>後台管理／監控</span></div>
+    <div class="legend-item"><span class="legend-line" style="border-top:2.5px dashed #DC2626"></span><span>異常通報</span></div>
+    <div class="legend-item"><span class="legend-line" style="border-top:2px dotted #6B7280"></span><span>回流路徑</span></div>
+  </div>
+
+  <svg id="dataflow" viewBox="0 0 1540 1340" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+
+    <defs>
+      <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#94A3B8"/>
+      </marker>
+      <marker id="arrow-dark" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#1E2D4C"/>
+      </marker>
+      <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#DC2626"/>
+      </marker>
+      <marker id="arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#7C3AED"/>
+      </marker>
+      <marker id="arrow-purple-start" viewBox="0 0 10 10" refX="0" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 10 0 L 0 5 L 10 10 z" fill="#7C3AED"/>
+      </marker>
+      <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#059669"/>
+      </marker>
+    </defs>
+
+    <!-- ========== 左半邊：主資料流（x=40~880） ========== -->
+
+    <!-- 來源單位 -->
+    <text x="40" y="32" font-size="13" font-weight="700" fill="#1E2D4C" letter-spacing="2">來源單位</text>
+    <g id="sources">
+      <rect x="40" y="48" width="158" height="56" rx="6" fill="#F1F5F9" stroke="#64748B" stroke-width="1.5"/>
+      <text x="119" y="72" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">觀光署本署</text>
+      <text x="119" y="90" text-anchor="middle" font-size="10" fill="#64748B">V2.1 XML、83 項</text>
+
+      <rect x="208" y="48" width="158" height="56" rx="6" fill="#F1F5F9" stroke="#64748B" stroke-width="1.5"/>
+      <text x="287" y="72" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">13 風管處</text>
+      <text x="287" y="90" text-anchor="middle" font-size="10" fill="#64748B">轄管景點／影音／摺頁</text>
+
+      <rect x="376" y="48" width="158" height="56" rx="6" fill="#F1F5F9" stroke="#64748B" stroke-width="1.5"/>
+      <text x="455" y="72" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">22 縣市政府</text>
+      <text x="455" y="90" text-anchor="middle" font-size="10" fill="#64748B">縣市觀光開放資料</text>
+
+      <rect x="544" y="48" width="158" height="56" rx="6" fill="#F1F5F9" stroke="#64748B" stroke-width="1.5"/>
+      <text x="623" y="72" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">中央部會</text>
+      <text x="623" y="90" text-anchor="middle" font-size="10" fill="#64748B">國家公園、林業保育</text>
+
+      <rect x="712" y="48" width="168" height="56" rx="6" fill="#F1F5F9" stroke="#64748B" stroke-width="1.5"/>
+      <text x="796" y="72" text-anchor="middle" font-size="12" font-weight="600" fill="#334155">個人／業者填報</text>
+      <text x="796" y="90" text-anchor="middle" font-size="10" fill="#64748B">透過後台填報入口</text>
+    </g>
+
+    <!-- 來源 → Raw DB 箭頭 -->
+    <g stroke="#94A3B8" stroke-width="1.5" fill="none">
+      <path d="M 460 104 L 460 130" marker-end="url(#arrow-gray)"/>
+    </g>
+
+    <!-- ① Raw Database -->
+    <g id="block-raw">
+      <rect x="40" y="135" width="840" height="115" rx="8" fill="#FFE4D9" stroke="#E55B30" stroke-width="2.5"/>
+      <rect x="40" y="135" width="180" height="115" rx="8" fill="#E55B30"/>
+      <text x="130" y="170" text-anchor="middle" font-size="20" font-weight="700" fill="white">①</text>
+      <text x="130" y="195" text-anchor="middle" font-size="18" font-weight="700" fill="white">Raw Database</text>
+      <text x="130" y="215" text-anchor="middle" font-size="12" fill="#FBE3D7">原始事實層</text>
+      <text x="130" y="233" text-anchor="middle" font-size="11" fill="#FFCBB3">鈕酷樂</text>
+
+      <text x="240" y="160" font-size="12" font-weight="700" fill="#E55B30">任務重點</text>
+      <text x="240" y="180" font-size="11" fill="#1F2937">• 接收來源單位提供之資料（API／SFTP／檔案）</text>
+      <text x="240" y="198" font-size="11" fill="#1F2937">• 原始格式入庫，不修改原資料</text>
+      <text x="240" y="216" font-size="11" fill="#1F2937">• 版本歷史完整保存（可追溯處理歷程）</text>
+      <text x="240" y="234" font-size="11" fill="#1F2937">• 結構化資料 ＋ 多媒體檔案統一入庫</text>
+    </g>
+
+    <!-- Raw DB → ETL -->
+    <line x1="460" y1="250" x2="460" y2="280" stroke="#1E2D4C" stroke-width="3" marker-end="url(#arrow-dark)"/>
+
+    <!-- ② ETL -->
+    <g id="block-etl">
+      <rect x="40" y="285" width="840" height="205" rx="8" fill="#FFE4D9" stroke="#E55B30" stroke-width="2.5"/>
+      <rect x="40" y="285" width="180" height="205" rx="8" fill="#E55B30"/>
+      <text x="130" y="330" text-anchor="middle" font-size="20" font-weight="700" fill="white">②</text>
+      <text x="130" y="358" text-anchor="middle" font-size="18" font-weight="700" fill="white">ETL</text>
+      <text x="130" y="380" text-anchor="middle" font-size="12" fill="#FBE3D7">結構處理層</text>
+      <text x="130" y="398" text-anchor="middle" font-size="11" fill="#FFCBB3">鈕酷樂</text>
+
+      <text x="240" y="310" font-size="12" font-weight="700" fill="#E55B30">任務重點</text>
+
+      <text x="240" y="332" font-size="11" font-weight="600" fill="#1F2937">結構化資料處理</text>
+      <text x="255" y="350" font-size="11" fill="#374151">• 格式對齊：Schema 映射 V2.1 ／ 編碼／座標／時間統一</text>
+      <text x="255" y="368" font-size="11" fill="#374151">• 欄位檢核：必填 ／ 格式 ／ 值域 ／ HTML 殘留清除</text>
+      <text x="255" y="386" font-size="11" fill="#374151">• UUID 比對更新</text>
+      <text x="255" y="404" font-size="11" fill="#374151">• 資料分流：七大類+多媒體 → Data Mart；其餘 → 直接入 OD</text>
+
+      <text x="240" y="427" font-size="11" font-weight="600" fill="#1F2937">多媒體處理</text>
+      <text x="255" y="445" font-size="11" fill="#374151">• 第一關 授權治理：五級分類、CC0 優先</text>
+      <text x="255" y="463" font-size="11" fill="#374151">• 第三關 品質控管：800 萬像素門檻（相似度去重移至思邁）</text>
+
+      <text x="240" y="481" font-size="10" font-style="italic" fill="#DC2626">⚠ 異常 → OD Platform 後台處理</text>
+    </g>
+
+    <!-- ETL → Data Mart -->
+    <line x1="460" y1="490" x2="460" y2="520" stroke="#1E2D4C" stroke-width="3" marker-end="url(#arrow-dark)"/>
+
+    <!-- ③ Data Mart -->
+    <g id="block-dm">
+      <rect x="40" y="525" width="840" height="245" rx="8" fill="#E0F2FE" stroke="#0891B2" stroke-width="2.5"/>
+      <rect x="40" y="525" width="180" height="245" rx="8" fill="#0891B2"/>
+      <text x="130" y="575" text-anchor="middle" font-size="20" font-weight="700" fill="white">③</text>
+      <text x="130" y="603" text-anchor="middle" font-size="18" font-weight="700" fill="white">Data Mart</text>
+      <text x="130" y="625" text-anchor="middle" font-size="12" fill="#BAE6FD">AI 處理層</text>
+      <text x="130" y="643" text-anchor="middle" font-size="11" fill="#7DD3FC">思邁</text>
+
+      <text x="240" y="550" font-size="12" font-weight="700" fill="#0891B2">任務重點</text>
+
+      <text x="240" y="572" font-size="11" font-weight="600" fill="#1F2937">語意層處理（結構化資料）</text>
+      <text x="255" y="590" font-size="11" fill="#374151">• 跨來源同實體判斷（回傳 duplicateUuid／replaceUuid／analyzeTime）</text>
+      <text x="255" y="608" font-size="11" fill="#374151">• 語意品質判讀（描述破碎、HTML 殘留）</text>
+      <text x="255" y="626" font-size="11" fill="#374151">• 內容補全（過短描述）</text>
+      <text x="255" y="644" font-size="11" fill="#374151">• 主題標籤生成（依鈕酷樂提供之判斷指引表）</text>
+      <text x="255" y="662" font-size="11" fill="#374151">• 多語翻譯（中→英／日／韓，專有用語對照向觀光署索取）</text>
+      <text x="255" y="680" font-size="11" fill="#374151">• 文本／圖像 向量化（Embedding）</text>
+
+      <text x="240" y="703" font-size="11" font-weight="600" fill="#1F2937">多媒體處理</text>
+      <text x="255" y="721" font-size="11" fill="#374151">• 第二關 AI 圖像標註（VLM Caption + 結構化標籤）</text>
+      <text x="255" y="739" font-size="11" fill="#374151">• 多媒體相似度去重（向量比對）</text>
+
+      <text x="240" y="757" font-size="10" font-style="italic" fill="#0891B2">※ Data Mart 接收範圍：七大類資料集 + 多媒體開放資料（其餘由 ETL 直接入 OD）</text>
+    </g>
+
+    <!-- Data Mart → OD Database -->
+    <line x1="460" y1="770" x2="460" y2="800" stroke="#1E2D4C" stroke-width="3" marker-end="url(#arrow-dark)"/>
+
+    <!-- ④ OD Database -->
+    <g id="block-od">
+      <rect x="40" y="805" width="840" height="175" rx="8" fill="#FFE4D9" stroke="#E55B30" stroke-width="2.5"/>
+      <rect x="40" y="805" width="180" height="175" rx="8" fill="#E55B30"/>
+      <text x="130" y="848" text-anchor="middle" font-size="20" font-weight="700" fill="white">④</text>
+      <text x="130" y="875" text-anchor="middle" font-size="18" font-weight="700" fill="white">OD Database</text>
+      <text x="130" y="898" text-anchor="middle" font-size="12" fill="#FBE3D7">對外正式版層</text>
+      <text x="130" y="916" text-anchor="middle" font-size="11" fill="#FFCBB3">鈕酷樂</text>
+
+      <text x="240" y="830" font-size="12" font-weight="700" fill="#E55B30">任務重點</text>
+      <text x="240" y="850" font-size="11" fill="#1F2937">• 接收 Data Mart 通過驗證之資料（七大類+多媒體）+ ETL 直送資料（其餘）</text>
+      <text x="240" y="868" font-size="11" fill="#1F2937">• 依思邁回傳 duplicateUuid／replaceUuid 建立實體主從關係（依 analyzeTime 處理）</text>
+      <text x="240" y="886" font-size="11" fill="#1F2937">• Schema.org JSON-LD 標記（七大類對應）</text>
+      <text x="240" y="904" font-size="11" fill="#1F2937">• V2.1 雙層架構（基本資料表 ＋ 附屬資料表）／ 多媒體 N:N 關聯</text>
+      <text x="240" y="922" font-size="11" fill="#1F2937">• 對外開放為最新版（舊版保留資料庫不對外）</text>
+      <text x="240" y="940" font-size="11" fill="#1F2937">• OAS 3.0 API 端點建置</text>
+    </g>
+
+    <!-- OD Database → 對外端點 -->
+    <line x1="460" y1="980" x2="460" y2="1015" stroke="#1E2D4C" stroke-width="3" marker-end="url(#arrow-dark)"/>
+
+    <!-- ========== 對外端點區（底部） ========== -->
+    <text x="40" y="1015" font-size="13" font-weight="700" fill="#1E2D4C" letter-spacing="2">對外端點</text>
+    <g id="endpoints">
+      <!-- 多媒體開放資料網（對外前台）— 用特殊配色強調 -->
+      <rect x="40" y="1030" width="298" height="100" rx="6" fill="#D1FAE5" stroke="#059669" stroke-width="2.5"/>
+      <rect x="40" y="1030" width="298" height="32" rx="6" fill="#059669"/>
+      <text x="189" y="1051" text-anchor="middle" font-size="13" font-weight="700" fill="white">★ 多媒體開放資料網（對外前台）</text>
+      <text x="55" y="1081" font-size="11" font-weight="600" fill="#064E3B">公眾使用｜鈕酷樂建置</text>
+      <text x="55" y="1098" font-size="10" fill="#065F46">• NLP 自然語意搜尋 ／ 以圖搜圖</text>
+      <text x="55" y="1114" font-size="10" fill="#065F46">• 多媒體下載 ／ 授權申請</text>
+
+      <!-- OAS API -->
+      <rect x="350" y="1030" width="170" height="100" rx="6" fill="#1E2D4C"/>
+      <text x="435" y="1055" text-anchor="middle" font-size="13" font-weight="700" fill="white">OAS 3.0 API</text>
+      <text x="435" y="1077" text-anchor="middle" font-size="10" fill="#94A3B8">鈕酷樂建置</text>
+      <text x="435" y="1097" text-anchor="middle" font-size="10" fill="#94A3B8">data.gov.tw</text>
+      <text x="435" y="1113" text-anchor="middle" font-size="10" fill="#94A3B8">第三方介接</text>
+
+      <!-- MCP Server → AI Agents -->
+      <rect x="532" y="1030" width="170" height="100" rx="6" fill="#1E2D4C"/>
+      <text x="617" y="1055" text-anchor="middle" font-size="13" font-weight="700" fill="white">MCP Server</text>
+      <text x="617" y="1072" text-anchor="middle" font-size="11" fill="#FBE3D7">→ AI Agents</text>
+      <text x="617" y="1095" text-anchor="middle" font-size="10" fill="#94A3B8">思邁建置</text>
+      <text x="617" y="1112" text-anchor="middle" font-size="10" fill="#94A3B8">喔熊組長</text>
+
+      <!-- 共構網站 -->
+      <rect x="714" y="1030" width="166" height="100" rx="6" fill="#1E2D4C"/>
+      <text x="797" y="1055" text-anchor="middle" font-size="13" font-weight="700" fill="white">共構網站</text>
+      <text x="797" y="1077" text-anchor="middle" font-size="10" fill="#94A3B8">先得利 CMS</text>
+      <text x="797" y="1097" text-anchor="middle" font-size="10" fill="#94A3B8">觀光資訊網群</text>
+      <text x="797" y="1113" text-anchor="middle" font-size="10" fill="#94A3B8">PWA、主題網站</text>
+    </g>
+
+    <!-- ========== 右半邊：OD Platform 後台控制中心 ========== -->
+    
+    <!-- OD Platform 大框 -->
+    <rect x="920" y="48" width="600" height="1042" rx="10" fill="#FAF5FF" stroke="#7C3AED" stroke-width="2.5" stroke-dasharray="8,3"/>
+    
+    <!-- OD Platform 標題 -->
+    <rect x="920" y="48" width="600" height="80" rx="10" fill="#7C3AED"/>
+    <text x="1220" y="78" text-anchor="middle" font-size="20" font-weight="700" fill="white">OD Platform</text>
+    <text x="1220" y="100" text-anchor="middle" font-size="12" fill="#E9D5FF">後台管理系統（不對外開放）</text>
+    <text x="1220" y="118" text-anchor="middle" font-size="11" fill="#DDD6FE">鈕酷樂建置 ｜ 駐點人員操作 ｜ 跨層控制平面</text>
+
+    <!-- 駐點人員圖示 -->
+    <rect x="940" y="145" width="560" height="42" rx="4" fill="#7C3AED" opacity="0.15"/>
+    <text x="1220" y="167" text-anchor="middle" font-size="12" font-weight="700" fill="#5B21B6">👥 駐點人員（開放資料業務）— 主要操作者</text>
+    <text x="1220" y="183" text-anchor="middle" font-size="10" fill="#6D28D9">每日異常處理／週活動更新／月報產出</text>
+
+    <!-- 模組 1：對應 Raw DB（同高度 y=135~250） -->
+    <rect x="940" y="205" width="560" height="80" rx="6" fill="white" stroke="#7C3AED" stroke-width="1.5"/>
+    <rect x="940" y="205" width="60" height="80" rx="6" fill="#7C3AED" opacity="0.4"/>
+    <text x="970" y="248" text-anchor="middle" font-size="20" font-weight="700" fill="#5B21B6">①</text>
+    <text x="1010" y="225" font-size="12" font-weight="700" fill="#5B21B6">對應 Raw Database 的管理</text>
+    <text x="1010" y="245" font-size="11" fill="#374151">• 來源單位填報入口 ／ 帳號權限管理</text>
+    <text x="1010" y="263" font-size="11" fill="#374151">• Raw DB 入庫監控（每日／每來源）</text>
+    <text x="1010" y="281" font-size="11" fill="#374151">• 版本歷史查詢 ／ 來源單位聯繫紀錄</text>
+
+    <!-- 模組 2：對應 ETL -->
+    <rect x="940" y="295" width="560" height="120" rx="6" fill="white" stroke="#7C3AED" stroke-width="1.5"/>
+    <rect x="940" y="295" width="60" height="120" rx="6" fill="#7C3AED" opacity="0.4"/>
+    <text x="970" y="358" text-anchor="middle" font-size="20" font-weight="700" fill="#5B21B6">②</text>
+    <text x="1010" y="315" font-size="12" font-weight="700" fill="#5B21B6">對應 ETL 的管理</text>
+    <text x="1010" y="335" font-size="11" fill="#374151">• 格式異常工作台（必填缺漏、格式錯誤）</text>
+    <text x="1010" y="353" font-size="11" fill="#374151">• HTML 殘留／亂碼清除結果檢視</text>
+    <text x="1010" y="371" font-size="11" fill="#374151">• 多媒體第一關（授權待釐清區）</text>
+    <text x="1010" y="389" font-size="11" fill="#374151">• 多媒體第三關（像素門檻不達標區）</text>
+    <text x="1010" y="407" font-size="11" fill="#374151">• ETL 處理進度監控 ／ 通報生成與發送</text>
+
+    <!-- 模組 3：對應 Data Mart -->
+    <rect x="940" y="425" width="560" height="110" rx="6" fill="white" stroke="#7C3AED" stroke-width="1.5"/>
+    <rect x="940" y="425" width="60" height="110" rx="6" fill="#7C3AED" opacity="0.4"/>
+    <text x="970" y="483" text-anchor="middle" font-size="20" font-weight="700" fill="#5B21B6">③</text>
+    <text x="1010" y="445" font-size="12" font-weight="700" fill="#5B21B6">對應 Data Mart 的管理（規格待雙方討論定案）</text>
+    <text x="1010" y="465" font-size="11" fill="#374151">• 重複資料判斷複核（duplicateUuid／replaceUuid 從屬關係審視）</text>
+    <text x="1010" y="483" font-size="11" fill="#374151">• 語意品質與內容補全結果檢視（描述破碎、補全建議）</text>
+    <text x="1010" y="501" font-size="11" fill="#374151">• 多媒體第二關（VLM 待覆核區）／ 相似度去重結果複核</text>
+    <text x="1010" y="519" font-size="11" fill="#374151">• AI 建議文字審閱 ／ 多語翻譯品質檢核</text>
+
+    <!-- 模組 4：對應 OD Database + 多媒體網站維護 -->
+    <rect x="940" y="545" width="560" height="155" rx="6" fill="white" stroke="#7C3AED" stroke-width="1.5"/>
+    <rect x="940" y="545" width="60" height="155" rx="6" fill="#7C3AED" opacity="0.4"/>
+    <text x="970" y="625" text-anchor="middle" font-size="20" font-weight="700" fill="#5B21B6">④</text>
+    <text x="1010" y="565" font-size="12" font-weight="700" fill="#5B21B6">對應 OD Database ＋ 對外前台維護</text>
+    <text x="1010" y="585" font-size="11" fill="#374151">• 版本比對監控（確認來源已修正）</text>
+    <text x="1010" y="603" font-size="11" fill="#374151">• 對外上下架管理 ／ 緊急下架</text>
+    <text x="1010" y="621" font-size="11" fill="#374151">• 多媒體開放資料網的內容維護（前台管理）</text>
+    <text x="1010" y="639" font-size="11" fill="#374151">• 資料品質儀表板（七指標即時監控）</text>
+    <text x="1010" y="657" font-size="11" fill="#374151">• 報告產出系統（月／季／年）</text>
+    <text x="1010" y="675" font-size="11" fill="#374151">• OAS API 文件管理 ／ 第三方介接管理</text>
+    <text x="1010" y="693" font-size="11" fill="#374151">• AI-Ready Data 可信任性欄位填寫</text>
+
+    <!-- 共同回流機制說明 -->
+    <rect x="940" y="715" width="560" height="120" rx="6" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5"/>
+    <text x="960" y="738" font-size="12" font-weight="700" fill="#92400E">共同回流機制（資料治理閉環）</text>
+    <text x="960" y="760" font-size="11" fill="#78350F">後台介面接收四類異常 → 駐點審視 → 通報生成</text>
+    <text x="960" y="778" font-size="11" fill="#78350F">→ 來源單位校正 → 重新進入 Raw DB → 重跑流程</text>
+    <text x="960" y="800" font-size="10" font-weight="700" fill="#92400E">遵循觀光署原則 ②④：</text>
+    <text x="960" y="817" font-size="10" fill="#78350F">「多來源依規則處理」｜「AI 建議＋人工複核＋來源校正」</text>
+
+    <!-- 對外前台關聯說明 -->
+    <rect x="940" y="845" width="560" height="80" rx="6" fill="#D1FAE5" stroke="#059669" stroke-width="1.5"/>
+    <text x="960" y="868" font-size="12" font-weight="700" fill="#064E3B">★ 與對外前台的關係</text>
+    <text x="960" y="888" font-size="11" fill="#064E3B">多媒體開放資料網是唯一的對外前台</text>
+    <text x="960" y="906" font-size="11" fill="#064E3B">資料來源：OD Database ｜ 維護操作：透過 OD Platform 後台</text>
+    <text x="960" y="922" font-size="10" font-style="italic" fill="#065F46">公眾看不到 OD Platform，只看得到多媒體開放資料網</text>
+
+    <!-- 介接點清單 -->
+    <rect x="940" y="935" width="560" height="145" rx="6" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1"/>
+    <text x="960" y="958" font-size="12" font-weight="700" fill="#1F2937">後台跨層介接（鈕酷樂 ↔ 思邁，API 通訊）</text>
+    <text x="960" y="978" font-size="10" fill="#374151">• POST /api/aiEnhance  鈕酷樂送整批資料 → 思邁回 reqUuid</text>
+    <text x="960" y="994" font-size="10" fill="#374151">• GET  /api/reqrecords/{reqUuid}/status  查詢處理進度</text>
+    <text x="960" y="1010" font-size="10" fill="#374151">• GET  /api/reqrecords/{reqUuid}/{lang}  取多語系處理結果</text>
+    <text x="960" y="1030" font-size="10" font-weight="700" fill="#7C3AED">鈕酷樂協助項目：</text>
+    <text x="960" y="1046" font-size="10" fill="#374151">• 提供主題標籤判斷指引表給思邁　• 向觀光署索取多語專有用語對照</text>
+    <text x="960" y="1066" font-size="10" font-weight="700" fill="#7C3AED">待 OD Platform 建置前討論：</text>
+    <text x="960" y="1080" font-size="10" fill="#374151">Data Mart 管理／維護介面規格、抽驗回流機制、批次失敗策略</text>
+
+    <!-- ========== 連線：OD Platform ↔ 各區塊（管理／監控）========== -->
+    <g stroke="#7C3AED" stroke-width="1.8" stroke-dasharray="5,3" fill="none">
+      <!-- ① ↔ Raw DB（雙向） -->
+      <path d="M 880 192 L 940 245" />
+      <circle cx="935" cy="243" r="3" fill="#7C3AED"/>
+      <circle cx="884" cy="194" r="3" fill="#7C3AED"/>
+      
+      <!-- ② ↔ ETL -->
+      <path d="M 880 387 L 940 355" />
+      <circle cx="935" cy="357" r="3" fill="#7C3AED"/>
+      <circle cx="884" cy="385" r="3" fill="#7C3AED"/>
+      
+      <!-- ③ ↔ Data Mart -->
+      <path d="M 880 637 L 940 480" />
+      <circle cx="935" cy="482" r="3" fill="#7C3AED"/>
+      <circle cx="884" cy="635" r="3" fill="#7C3AED"/>
+      
+      <!-- ④ ↔ OD Database -->
+      <path d="M 880 862 L 940 620" />
+      <circle cx="935" cy="622" r="3" fill="#7C3AED"/>
+      <circle cx="884" cy="860" r="3" fill="#7C3AED"/>
+    </g>
+    
+    <!-- 標籤 -->
+    <text x="900" y="270" font-size="9" font-weight="600" fill="#7C3AED" font-style="italic">監控/操作</text>
+    <text x="900" y="345" font-size="9" font-weight="600" fill="#7C3AED" font-style="italic">監控/操作</text>
+    <text x="900" y="555" font-size="9" font-weight="600" fill="#7C3AED" font-style="italic">監控/操作</text>
+    <text x="900" y="755" font-size="9" font-weight="600" fill="#7C3AED" font-style="italic">監控/操作</text>
+
+    <!-- ========== 連線：OD Database → 多媒體開放資料網（綠色）========== -->
+    <g stroke="#059669" stroke-width="2.5" fill="none">
+      <path d="M 200 980 L 200 1030" marker-end="url(#arrow-green)"/>
+    </g>
+    <text x="100" y="1005" font-size="10" font-weight="700" fill="#059669" font-style="italic">提供開放資料</text>
+
+    <!-- ========== 回流路徑：OD Platform 後台 → 來源單位 ========== -->
+    <g stroke="#6B7280" stroke-width="2" stroke-dasharray="2,3" fill="none">
+      <path d="M 1220 48 L 1220 20 L 460 20 L 460 48" marker-end="url(#arrow-gray)"/>
+    </g>
+    <text x="700" y="16" font-size="11" font-weight="600" fill="#6B7280" font-style="italic">↑ 回流路徑：後台駐點通報 → 來源單位重新提供修正資料</text>
+
+  </svg>
+
+  <div class="notes">
+    <h3>備註說明（設計重點 — 已對齊《鈕酷樂×思邁介接文件》）</h3>
+    <div class="notes-grid">
+      <div class="note-item">
+        <strong>① 四大資料區塊是「資料生命週期」</strong><br>
+        Raw DB（原始事實）→ ETL（結構處理）→ Data Mart（AI 處理）→ OD Database（對外正式版）。四者非主從關係，而是資料的四個生命階段。
+      </div>
+      <div class="note-item purple">
+        <strong>② OD Platform 是「後台控制中心」，不對外</strong><br>
+        OD Platform 是跨四個資料區塊的後台管理系統，駐點人員透過此介面操作所有資料治理工作。公眾完全看不到 OD Platform。
+      </div>
+      <div class="note-item green">
+        <strong>③ 多媒體開放資料網是唯一的對外前台</strong><br>
+        資料來源：OD Database；維護操作：透過 OD Platform 後台。公眾在這裡使用 NLP 搜尋、以圖搜圖、下載、授權申請。
+      </div>
+      <div class="note-item cyan">
+        <strong>④ Data Mart 範圍：七大類 + 多媒體</strong><br>
+        Data Mart 只接收七大類資料集（景點／旅宿／餐飲／活動／步道／自行車道／旅服站點）+ 多媒體開放資料；其餘資料集（如新聞、行程主題等）由 ETL 直接寫入 OD Database。
+      </div>
+      <div class="note-item cyan">
+        <strong>⑤ 鈕思介接：API（reqUuid 機制）</strong><br>
+        三個端點：POST /api/aiEnhance（送批次資料）／GET /api/reqrecords/&#123;reqUuid&#125;/status（查進度）／GET /api/reqrecords/&#123;reqUuid&#125;/&#123;lang&#125;（取多語結果）。整批 array 一次傳送。
+      </div>
+      <div class="note-item cyan">
+        <strong>⑥ 重複資料判斷：UUID 從屬機制</strong><br>
+        思邁回傳 duplicateUuid（手下）／replaceUuid（老大）／analyzeTime。鈕酷樂直接依此寫入主從關係，不再做「規則套用挑主資料」。
+      </div>
+      <div class="note-item">
+        <strong>⑦ 不修改原始資料原則</strong><br>
+        所有處理（檢核、補全、標籤、翻譯）皆不回寫原始資料；版本歷史完整保存；OD Database 對外為最新版，舊版保留資料庫但不對外。
+      </div>
+      <div class="note-item">
+        <strong>⑧ 多媒體三關歸屬（已釐清）</strong><br>
+        第一關 授權治理（ETL／鈕酷樂）→ 第二關 AI 圖像標註＋相似度去重（Data Mart／思邁）→ 第三關 像素門檻（ETL／鈕酷樂）。
+      </div>
+      <div class="note-item amber">
+        <strong>⑨ 鈕酷樂協助項目（已確認）</strong><br>
+        ・提供主題標籤判斷指引表給思邁<br>
+        ・向觀光署索取多語翻譯之專有用語對照
+      </div>
+      <div class="note-item amber">
+        <strong>⑩ 待 OD Platform 建置前討論</strong><br>
+        ・對應 Data Mart 管理／維護介面之規格<br>
+        ・後台對思邁 Data Mart 的抽驗與回流機制<br>
+        ・批次失敗處理與重試策略<br>
+        ・多媒體與結構化資料的 N:N 關聯表設計
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function redraw() {
+    const svg = document.getElementById('dataflow');
+    if (!svg) return;
+  }
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(redraw, 100);
+  });
+  redraw();
+</script>
+</body>
+</html>
